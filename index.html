@@ -16,7 +16,7 @@
 #modal .modal-top h3{margin:0;font:clamp(20px,2vw,28px) Georgia,serif}
 #modal button{background:#40372f;color:white;border:1px solid #7b6d60;border-radius:5px;padding:12px 18px;cursor:pointer;font-size:15px}
 #modal button:disabled{opacity:.4;cursor:not-allowed}
-#modal .flip-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#modal .flip-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:visible;padding:28px 30px;box-sizing:border-box}
 #modal .flip-host{position:relative;flex:none}
 #modal .page{background:#fff;color:#786a5c;border:0!important;box-sizing:border-box;overflow:hidden;padding:0!important;margin:0!important}
 #modal .page-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:32px Georgia,serif}
@@ -67,10 +67,10 @@ async function openBook(n){
  host.replaceChildren();
  if(!window.St||!St.PageFlip){host.textContent='Библиотека перелистывания не загрузилась';return}
  const stage=document.getElementById('flipStage');
- const availableH=Math.max(260,stage.clientHeight-24);
- const availableW=Math.max(260,stage.clientWidth-24);
+ const availableH=Math.max(220,stage.clientHeight-96);
+ const availableW=Math.max(220,stage.clientWidth-96);
  const portrait=availableW<650;
- const pageH=Math.floor(Math.min(720,availableH,availableW/(portrait?.72:1.44)));
+ const pageH=Math.floor(Math.min(650,availableH,availableW/(portrait?.72:1.44)));
  const pageW=Math.floor(pageH*.72);
  host.style.width=(portrait?pageW:pageW*2)+'px';
  host.style.height=pageH+'px';
