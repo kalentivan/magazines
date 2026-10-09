@@ -17,7 +17,7 @@
 #modal button{cursor:pointer;background:#40372f;color:#fff;border:1px solid #7b6d60;padding:12px 20px;border-radius:5px;font-size:15px}
 #modal button:disabled{opacity:.35;cursor:not-allowed}
 #modal .flip-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:16px 0;perspective:2000px}
-#modal .book{position:relative;width:min(92vw,calc((100dvh - 220px)*1.42),1100px);aspect-ratio:1.42/1;display:flex;filter:drop-shadow(0 20px 24px #0007)}
+#modal .book{touch-action:pan-y;position:relative;width:min(92vw,calc((100dvh - 220px)*1.42),1100px);aspect-ratio:1.42/1;display:flex;filter:drop-shadow(0 20px 24px #0007)}
 #modal .paper{position:relative;flex:1;min-width:0;background:#fffdf7;color:#8a7a68;border:1px solid #d5c8b7;display:flex;align-items:center;justify-content:center;font:clamp(18px,3vw,36px) Georgia,serif;backface-visibility:hidden}
 #modal .paper.left{border-radius:8px 0 0 8px;box-shadow:inset -20px 0 25px -22px #30251b88}
 #modal .paper.right{border-radius:0 8px 8px 0;box-shadow:inset 20px 0 25px -22px #30251b88}
@@ -80,6 +80,52 @@ function turn(direction){
  sheet.classList.toggle('flipped',direction>0);
  setTimeout(()=>{spread+=direction;sheet.style.transition='none';sheet.classList.remove('flipped');sheet.style.left='50%';renderBook();animating=false;renderBook()},680);
 }
+
+// Interactive page drag: grab either outside page edge and move toward the spine.
+let drag=null;
+const bookEl=document.getElementById('demoBook');
+const sheetEl=document.getElementById('turnSheet');
+function dragProgress(x,rect,dir){
+ const center=rect.left+rect.width/2;
+ return dir===1?Math.max(0,Math.min(1,(rect.right-x)/(rect.width/2))):Math.max(0,Math.min(1,(x-rect.left)/(rect.width/2)));
+}
+bookEl.addEventListener('pointerdown',e=>{
+ if(animating||!document.getElementById('modal').classList.contains('open'))return;
+ const rect=bookEl.getBoundingClientRect(),mid=rect.left+rect.width/2;
+ const dir=e.clientX>=mid?1:-1;
+ const max=Math.ceil(activeBook.count/2)-1;
+ if(spread+dir<0||spread+dir>max)return;
+ const nearEdge=dir===1?e.clientX>rect.right-rect.width*.22:e.clientX<rect.left+rect.width*.22;
+ if(!nearEdge)return;
+ drag={id:e.pointerId,dir,rect,progress:0};
+ bookEl.setPointerCapture(e.pointerId);
+ sheetEl.style.transition='none';
+ sheetEl.style.left='50%';
+ const current=spread*2+1;
+ sheetEl.querySelector('.front').textContent=dir===1?current+1:current-1;
+ sheetEl.querySelector('.back').textContent=dir===1?current+2:current;
+ sheetEl.style.transform='rotateY(0deg)';
+ e.preventDefault();
+});
+bookEl.addEventListener('pointermove',e=>{
+ if(!drag||e.pointerId!==drag.id)return;
+ drag.progress=dragProgress(e.clientX,drag.rect,drag.dir);
+ sheetEl.style.transform='rotateY('+(-180*drag.progress)+'deg)';
+});
+function endDrag(e){
+ if(!drag||e.pointerId!==drag.id)return;
+ const {dir,progress}=drag;drag=null;animating=true;
+ const finish=progress>.48;
+ sheetEl.style.transition='transform .35s ease-out';
+ sheetEl.style.transform='rotateY('+(finish?-180:0)+'deg)';
+ setTimeout(()=>{
+  if(finish)spread+=dir;
+  sheetEl.style.transition='none';sheetEl.style.transform='';sheetEl.classList.remove('flipped');
+  animating=false;renderBook();
+ },370);
+}
+bookEl.addEventListener('pointerup',endDrag);
+bookEl.addEventListener('pointercancel',endDrag);
 document.addEventListener('keydown',e=>{if(!document.getElementById('modal').classList.contains('open'))return;if(e.key==='Escape')closeBook();else if(e.key==='ArrowRight')turn(1);else if(e.key==='ArrowLeft')turn(-1)});
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeBook()});
 </script></body></html>
