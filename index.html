@@ -28,7 +28,7 @@
 <div class="modal-box"><div class="modal-top"><h3 id="modalTitle">Журнал</h3><button type="button" onclick="closeBook()">✕ Закрыть</button></div>
 <div class="flip-stage" id="flipStage"><div id="flipHost" class="flip-host"></div></div>
 <div class="controls"><button id="prevPage" type="button" onclick="turn(-1)">← Назад</button><span id="counter">1 / 16</span><button id="nextPage" type="button" onclick="turn(1)">Вперёд →</button></div>
-<p class="fine">Потяните за угол страницы мышкой или пальцем либо используйте кнопки.</p></div></div>
+<p class="fine">Потяните за угол страницы или используйте кнопки. Версия: 2026-10-09.2</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 <script>
 const books=[{name:'Детский журнал',count:16},{name:'Твой мир',count:19}];
@@ -55,13 +55,15 @@ function updateCounter(){
  document.getElementById('nextPage').disabled=i>=activeBook.count-1;
 }
 async function openBook(n){
- closeBook();++openSequence;activeBook=books[n];
+ closeBook();const sequence=++openSequence;activeBook=books[n];
  const modal=document.getElementById('modal');
  modal.style.display='block';modal.classList.add('open');document.body.style.overflow='hidden';
  document.getElementById('modalTitle').textContent=activeBook.name;
  const host=document.getElementById('flipHost');host.replaceChildren();
- host.textContent='Подготавливаем журнал…';
- preloadMagazine(activeBook,n).catch(error=>console.warn('Image preload:',error));
+ host.textContent='Загружаем страницы журнала…';
+ const result=await preloadMagazine(activeBook,n).catch(error=>({failed:activeBook.count,error}));
+ if(sequence!==openSequence||!modal.classList.contains('open'))return;
+ if(result.failed){host.textContent='Не удалось загрузить '+result.failed+' страниц. Попробуйте повторить открытие.';imageCache.delete((n===0?'kids':'world')+':'+activeBook.count);return}
  host.replaceChildren();
  if(!window.St||!St.PageFlip){host.textContent='Библиотека перелистывания не загрузилась';return}
  const stage=document.getElementById('flipStage');
@@ -79,7 +81,7 @@ async function openBook(n){
   const img=document.createElement('img');
   img.src='assets/'+(n===0?'kids':'world')+'/'+String(i+1).padStart(2,'0')+'.webp';
   img.alt=activeBook.name+' — страница '+(i+1);
-  img.loading='eager';img.fetchPriority=i<4?'high':'auto';
+  img.loading='eager';img.decoding='sync';img.fetchPriority=i<4?'high':'auto';
   img.draggable=false;
   img.style.cssText='display:block;width:100%;height:100%;object-fit:contain;background:#fff;pointer-events:none;user-select:none';
   img.onerror=()=>{page.textContent='Страница '+(i+1)+' не загрузилась';};
