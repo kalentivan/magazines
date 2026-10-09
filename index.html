@@ -55,16 +55,14 @@ function updateCounter(){
  document.getElementById('nextPage').disabled=i>=activeBook.count-1;
 }
 async function openBook(n){
- closeBook();const sequence=++openSequence;activeBook=books[n];
+ closeBook();++openSequence;activeBook=books[n];
  const modal=document.getElementById('modal');
  modal.style.display='block';modal.classList.add('open');document.body.style.overflow='hidden';
  document.getElementById('modalTitle').textContent=activeBook.name;
  const host=document.getElementById('flipHost');host.replaceChildren();
- host.textContent='Загружаем страницы журнала…';
- const preload=await preloadMagazine(activeBook,n);
- if(sequence!==openSequence||!modal.classList.contains('open'))return;
+ host.textContent='Подготавливаем журнал…';
+ preloadMagazine(activeBook,n).catch(error=>console.warn('Image preload:',error));
  host.replaceChildren();
- if(preload.failed){host.textContent='Не удалось загрузить '+preload.failed+' страниц. Проверьте соединение и повторите попытку.';imageCache.delete((n===0?'kids':'world')+':'+activeBook.count);return}
  if(!window.St||!St.PageFlip){host.textContent='Библиотека перелистывания не загрузилась';return}
  const stage=document.getElementById('flipStage');
  const availableH=Math.max(260,stage.clientHeight-24);
@@ -81,7 +79,7 @@ async function openBook(n){
   const img=document.createElement('img');
   img.src='assets/'+(n===0?'kids':'world')+'/'+String(i+1).padStart(2,'0')+'.webp';
   img.alt=activeBook.name+' — страница '+(i+1);
-  img.loading='eager';
+  img.loading='eager';img.fetchPriority=i<4?'high':'auto';
   img.draggable=false;
   img.style.cssText='display:block;width:100%;height:100%;object-fit:contain;background:#fff;pointer-events:none;user-select:none';
   img.onerror=()=>{page.textContent='Страница '+(i+1)+' не загрузилась';};
@@ -93,7 +91,7 @@ async function openBook(n){
   flippingTime:850,clickEventForward:true,useMouseEvents:true,
   mobileScrollSupport:false,swipeDistance:30,showPageCorners:false,disableFlipByClick:false
  });
- flip.loadFromHTML(sheets);
+ try{flip.loadFromHTML(sheets)}catch(error){console.error('Flipbook initialization failed:',error);host.textContent='Не удалось открыть журнал. Попробуйте обновить страницу.';return}
  flip.on('flip',updateCounter);
  flip.on('init',updateCounter);
  updateCounter();
