@@ -28,7 +28,7 @@
 <div class="modal-box"><div class="modal-top"><h3 id="modalTitle">Журнал</h3><button type="button" onclick="closeBook()">✕ Закрыть</button></div>
 <div class="flip-stage" id="flipStage"><div id="flipHost" class="flip-host"></div></div>
 <div class="controls"><button id="prevPage" type="button" onclick="turn(-1)">← Назад</button><span id="counter">1 / 16</span><button id="nextPage" type="button" onclick="turn(1)">Вперёд →</button></div>
-<p class="fine">Тестовый журнал без изображений. Потяните за угол страницы мышкой или пальцем.</p></div></div>
+<p class="fine">Потяните за угол страницы мышкой или пальцем либо используйте кнопки.</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 <script>
 const books=[{name:'Детский журнал',count:16},{name:'Твой мир',count:19}];
@@ -44,7 +44,7 @@ function openBook(n){
  closeBook();activeBook=books[n];
  const modal=document.getElementById('modal');
  modal.style.display='block';modal.classList.add('open');document.body.style.overflow='hidden';
- document.getElementById('modalTitle').textContent=activeBook.name+' — тестовый журнал';
+ document.getElementById('modalTitle').textContent=activeBook.name;
  const host=document.getElementById('flipHost');host.replaceChildren();
  if(!window.St||!St.PageFlip){host.textContent='Библиотека перелистывания не загрузилась';return}
  const stage=document.getElementById('flipStage');
@@ -59,8 +59,14 @@ function openBook(n){
  for(let i=0;i<activeBook.count;i++){
   const page=document.createElement('div');page.className='page';
   if(i===0||i===activeBook.count-1)page.dataset.density='hard';
-  const inner=document.createElement('div');inner.className='page-inner';inner.textContent=i+1;
-  page.append(inner);sheets.push(page);
+  const img=document.createElement('img');
+  img.src='assets/'+(n===0?'kids':'world')+'/'+String(i+1).padStart(2,'0')+'.webp';
+  img.alt=activeBook.name+' — страница '+(i+1);
+  img.loading=i<4?'eager':'lazy';
+  img.draggable=false;
+  img.style.cssText='display:block;width:100%;height:100%;object-fit:contain;background:#fff;pointer-events:none;user-select:none';
+  img.onerror=()=>{page.textContent='Страница '+(i+1)+' не загрузилась';};
+  page.append(img);sheets.push(page);
  }
  flip=new St.PageFlip(host,{
   width:pageW,height:pageH,size:'fixed',showCover:false,
