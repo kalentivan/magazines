@@ -43,7 +43,7 @@ function updateCounter(){
 function openBook(n){
  closeBook();activeBook=books[n];
  const modal=document.getElementById('modal');
- modal.classList.add('open');document.body.style.overflow='hidden';
+ modal.style.display='block';modal.classList.add('open');document.body.style.overflow='hidden';
  document.getElementById('modalTitle').textContent=activeBook.name+' — тестовый журнал';
  const host=document.getElementById('flipHost');host.replaceChildren();
  if(!window.St||!St.PageFlip){host.textContent='Библиотека перелистывания не загрузилась';return}
@@ -74,10 +74,13 @@ function openBook(n){
  updateCounter();
 }
 function closeBook(){
- if(flip){flip.destroy();flip=null}
- document.getElementById('flipHost').replaceChildren();
- document.getElementById('modal').classList.remove('open');
+ const modal=document.getElementById('modal');
+ modal.classList.remove('open');
+ modal.style.display='none';
  document.body.style.overflow='';
+ const previous=flip;flip=null;
+ if(previous){try{previous.destroy()}catch(error){console.warn('Flipbook cleanup:',error)}}
+ document.getElementById('flipHost').replaceChildren();
 }
 function turn(dir){if(!flip)return;dir>0?flip.flipNext():flip.flipPrev()}
 document.addEventListener('keydown',e=>{if(!document.getElementById('modal').classList.contains('open'))return;if(e.key==='Escape')closeBook();else if(e.key==='ArrowRight')turn(1);else if(e.key==='ArrowLeft')turn(-1)});
