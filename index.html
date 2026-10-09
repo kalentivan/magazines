@@ -32,7 +32,21 @@
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 <script>
 const books=[{name:'Детский журнал',count:16},{name:'Твой мир',count:19}];
-let flip=null,activeBook=null;
+let flip=null,activeBook=null,openSequence=0;
+const imageCache=new Map();
+function preloadMagazine(book,n){
+ const folder=n===0?'kids':'world';
+ const key=folder+':'+book.count;
+ if(imageCache.has(key))return imageCache.get(key);
+ const promise=Promise.all(Array.from({length:book.count},(_,i)=>new Promise(resolve=>{
+  const img=new Image();img.decoding='async';
+  img.onload=()=>{if(img.decode)img.decode().catch(()=>{}).finally(()=>resolve(img));else resolve(img)};
+  img.onerror=()=>resolve(null);
+  img.src='assets/'+folder+'/'+String(i+1).padStart(2,'0')+'.webp';
+ }))).then(images=>({images,failed:images.filter(x=>!x).length}));
+ imageCache.set(key,promise);return promise;
+}
+
 function updateCounter(){
  if(!flip||!activeBook)return;
  const i=flip.getCurrentPageIndex();
@@ -40,12 +54,17 @@ function updateCounter(){
  document.getElementById('prevPage').disabled=i===0;
  document.getElementById('nextPage').disabled=i>=activeBook.count-1;
 }
-function openBook(n){
- closeBook();activeBook=books[n];
+async function openBook(n){
+ closeBook();const sequence=++openSequence;activeBook=books[n];
  const modal=document.getElementById('modal');
  modal.style.display='block';modal.classList.add('open');document.body.style.overflow='hidden';
  document.getElementById('modalTitle').textContent=activeBook.name;
  const host=document.getElementById('flipHost');host.replaceChildren();
+ host.textContent='Загружаем страницы журнала…';
+ const preload=await preloadMagazine(activeBook,n);
+ if(sequence!==openSequence||!modal.classList.contains('open'))return;
+ host.replaceChildren();
+ if(preload.failed){host.textContent='Не удалось загрузить '+preload.failed+' страниц. Проверьте соединение и повторите попытку.';imageCache.delete((n===0?'kids':'world')+':'+activeBook.count);return}
  if(!window.St||!St.PageFlip){host.textContent='Библиотека перелистывания не загрузилась';return}
  const stage=document.getElementById('flipStage');
  const availableH=Math.max(260,stage.clientHeight-24);
@@ -62,7 +81,7 @@ function openBook(n){
   const img=document.createElement('img');
   img.src='assets/'+(n===0?'kids':'world')+'/'+String(i+1).padStart(2,'0')+'.webp';
   img.alt=activeBook.name+' — страница '+(i+1);
-  img.loading=i<4?'eager':'lazy';
+  img.loading='eager';
   img.draggable=false;
   img.style.cssText='display:block;width:100%;height:100%;object-fit:contain;background:#fff;pointer-events:none;user-select:none';
   img.onerror=()=>{page.textContent='Страница '+(i+1)+' не загрузилась';};
@@ -80,6 +99,7 @@ function openBook(n){
  updateCounter();
 }
 function closeBook(){
+ ++openSequence;
  const modal=document.getElementById('modal');
  modal.classList.remove('open');
  modal.style.display='none';
