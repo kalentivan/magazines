@@ -20,7 +20,7 @@
 #modal .flip-host{position:relative;flex:none}
 #modal .page{background:#fff;color:#786a5c;border:0!important;box-sizing:border-box;overflow:hidden;padding:0!important;margin:0!important}
 #modal .page-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:32px Georgia,serif}
-#modal .controls{display:flex;align-items:center;justify-content:center;gap:12px;padding:8px;flex-wrap:wrap;position:relative;z-index:5;background:#f8f5ef;border-radius:6px;align-self:center}#modal .controls #counter,#modal #zoomValue{color:#40372f}#modal .zoom-controls{display:flex;align-items:center;gap:6px}#modal .zoom-controls button{min-width:42px;padding:10px}#modal #zoomValue{font-size:13px;min-width:46px;text-align:center}
+#modal .controls{display:flex;align-items:center;justify-content:center;gap:12px;padding:8px;flex-wrap:wrap;position:relative;z-index:5;background:transparent;border-radius:6px;align-self:center}#modal .controls #counter,#modal #zoomValue{color:#40372f}#modal .zoom-controls{display:flex;align-items:center;gap:6px}#modal .zoom-controls button{min-width:42px;padding:10px}#modal #zoomValue{font-size:13px;min-width:46px;text-align:center}
 #modal .fine{color:#c5b8ab;text-align:center;font-size:12px;margin:3px}
 @media(max-width:650px){#modal .modal-box{padding:10px}#modal button{padding:10px}#modal .fine{display:none}}
 </style>
@@ -28,7 +28,7 @@
 <div class="modal-box"><div class="modal-top"><h3 id="modalTitle">Журнал</h3><button type="button" onclick="closeBook()">✕ Закрыть</button></div>
 <div class="flip-stage" id="flipStage"><div id="flipHost" class="flip-host"></div></div>
 <div class="controls"><button id="prevPage" type="button" onclick="turn(-1)">← Назад</button><span id="counter">1 / 16</span><button id="nextPage" type="button" onclick="turn(1)">Вперёд →</button><div class="zoom-controls"><button type="button" onclick="changeZoom(-.1)" aria-label="Уменьшить масштаб">−</button><span id="zoomValue">100%</span><button type="button" onclick="changeZoom(.1)" aria-label="Увеличить масштаб">+</button></div></div>
-<p class="fine">Потяните за угол страницы или используйте кнопки. Версия: 2026-10-10.5</p></div></div>
+<p class="fine">Потяните за угол страницы или используйте кнопки. Версия: 2026-10-10.6</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 <script>
 const books=[{name:'Детский журнал',count:16},{name:'Твой мир',count:19}];
