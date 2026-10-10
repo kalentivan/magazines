@@ -28,7 +28,7 @@
 <div class="modal-box"><div class="modal-top"><h3 id="modalTitle">Журнал</h3><button type="button" onclick="closeBook()">✕ Закрыть</button></div>
 <div class="flip-stage" id="flipStage"><div id="flipHost" class="flip-host"></div></div>
 <div class="controls"><button id="prevPage" type="button" onclick="turn(-1)">← Назад</button><span id="counter">1 / 16</span><button id="nextPage" type="button" onclick="turn(1)">Вперёд →</button></div>
-<p class="fine">Потяните за угол страницы или используйте кнопки. Версия: 2026-10-09.2</p></div></div>
+<p class="fine">Потяните за угол страницы или используйте кнопки. Версия: 2026-10-10.1</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 <script>
 const books=[{name:'Детский журнал',count:16},{name:'Твой мир',count:19}];
@@ -69,10 +69,10 @@ async function openBook(n){
  const stage=document.getElementById('flipStage');
  const availableH=Math.max(220,stage.clientHeight-96);
  const availableW=Math.max(220,stage.clientWidth-96);
- const portrait=availableW<650;
- const pageH=Math.floor(Math.min(650,availableH,availableW/(portrait?.72:1.44)));
+ const portrait=false;
+ const pageH=Math.floor(Math.min(650,availableH,availableW/1.44));
  const pageW=Math.floor(pageH*.72);
- host.style.width=(portrait?pageW:pageW*2)+'px';
+ host.style.width=(pageW*2)+'px';
  host.style.height=pageH+'px';
  const sheets=[];
  for(let i=0;i<activeBook.count;i++){
@@ -88,8 +88,8 @@ async function openBook(n){
   page.append(img);sheets.push(page);
  }
  flip=new St.PageFlip(host,{
-  width:pageW,height:pageH,size:'fixed',showCover:false,
-  usePortrait:true,drawShadow:true,maxShadowOpacity:.5,
+  width:pageW,height:pageH,size:'fixed',showCover:true,
+  usePortrait:false,drawShadow:true,maxShadowOpacity:.5,
   flippingTime:850,clickEventForward:true,useMouseEvents:true,
   mobileScrollSupport:false,swipeDistance:30,showPageCorners:false,disableFlipByClick:false
  });
