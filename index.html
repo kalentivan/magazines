@@ -28,11 +28,11 @@
 <div class="modal-box"><div class="modal-top"><h3 id="modalTitle">Журнал</h3><button type="button" onclick="closeBook()">✕ Закрыть</button></div>
 <button class="magazine-nav previous" id="previousMagazine" type="button" onclick="switchMagazine(-1)" aria-label="Предыдущий журнал">‹</button><button class="magazine-nav next" id="nextMagazine" type="button" onclick="switchMagazine(1)" aria-label="Следующий журнал">›</button><div class="flip-stage" id="flipStage"><div id="flipHost" class="flip-host"></div></div>
 <div class="controls"><button id="prevPage" type="button" onclick="turn(-1)">← Назад</button><span id="counter">1 / 16</span><button id="nextPage" type="button" onclick="turn(1)">Вперёд →</button><div class="zoom-controls"><button type="button" onclick="changeZoom(-.1)" aria-label="Уменьшить масштаб">−</button><span id="zoomValue">100%</span><button type="button" onclick="changeZoom(.1)" aria-label="Увеличить масштаб">+</button></div></div>
-<p class="fine">Потяните за угол страницы или используйте кнопки. Версия: 2026-10-10.7</p></div></div>
+<p class="fine">Потяните за угол страницы или используйте кнопки. Версия: 2026-10-10.8</p></div></div>
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 <script>
 const books=[{name:'Детский журнал',count:16},{name:'Твой мир',count:19}];
-let flip=null,activeBook=null,openSequence=0,zoom=1,basePageWidth=0,basePageHeight=0;
+let flip=null,activeBook=null,activeBookIndex=-1,openSequence=0,zoom=1,basePageWidth=0,basePageHeight=0;
 const imageCache=new Map();
 function preloadMagazine(book,n){
  const folder=n===0?'kids':'world';
@@ -56,13 +56,13 @@ function changeZoom(delta){
  document.getElementById('zoomValue').textContent=Math.round(zoom*100)+'%';
 }
 function switchMagazine(direction){
- const current=books.indexOf(activeBook);
+ const current=activeBookIndex;
  const target=current+direction;
  if(current<0||target<0||target>=books.length)return;
  openBook(target);
 }
 function updateMagazineNavigation(){
- const index=books.indexOf(activeBook);
+ const index=activeBookIndex;
  document.getElementById('previousMagazine').disabled=index<=0;
  document.getElementById('nextMagazine').disabled=index<0||index>=books.length-1;
 }
@@ -74,7 +74,7 @@ function updateCounter(){
  document.getElementById('nextPage').disabled=i>=activeBook.count-1;
 }
 async function openBook(n){
- closeBook();const sequence=++openSequence;activeBook=books[n];
+ closeBook();const sequence=++openSequence;activeBookIndex=n;activeBook=books[n];
  const modal=document.getElementById('modal');
  updateMagazineNavigation();
  modal.style.display='block';modal.classList.add('open');document.body.style.overflow='hidden';
