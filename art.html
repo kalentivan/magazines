@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Art — Милена Дмитриева | Портфолио</title>
+<meta name="description" content="Портфолио художника Милены Дмитриевой. 35 страниц работ: морские пейзажи, графика, абстракция.">
+<style>
+:root{color-scheme:light;--ink:#3b3630;--gold:#9d805b;--bg:#f6f2eb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px clamp(16px,4vw,70px);border-bottom:1px solid #ded4c5;background:#fcfaf6}
+.brand{text-decoration:none;color:var(--ink);font-family:Georgia,serif;font-size:25px;letter-spacing:.02em}.back{color:var(--ink);text-decoration:none;font-size:14px;border-bottom:1px solid var(--gold);padding-bottom:3px}
+main{max-width:1500px;margin:auto;padding:24px 16px 45px;text-align:center}
+h1{font:normal clamp(27px,4vw,45px) Georgia,serif;margin:8px 0 7px}
+.subtitle{color:#857666;font-size:14px;margin:0 0 22px}
+.viewer{display:flex;align-items:center;justify-content:center;min-height:250px;position:relative}
+canvas{display:block;max-width:100%;height:auto;background:white;box-shadow:0 12px 38px #473c302b}
+.status{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#6e6255;background:#f6f2eb;z-index:1}
+.status[hidden]{display:none}
+.controls{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px;margin:20px auto 8px}
+button{background:#453b32;border:0;color:#fff;border-radius:5px;cursor:pointer;padding:13px 20px;font-size:15px;min-width:118px}
+button:disabled{opacity:.35;cursor:default}.count{font-size:15px;min-width:95px;font-variant-numeric:tabular-nums}
+.download{color:#76634c;font-size:13px;text-decoration:underline;text-underline-offset:3px}
+.hint{font-size:12px;color:#958779;margin:16px 0 0}
+@media(max-width:600px){header{padding:15px}.brand{font-size:21px}main{padding:20px 10px 35px}.controls{gap:10px}button{padding:12px 13px;min-width:105px}}
+</style>
+</head>
+<body>
+<header><a class="brand" href="./">Art · Милена Дмитриева</a><a class="back" href="./">← На главную</a></header>
+<main><h1>Портфолио работ</h1><p class="subtitle">Милена Дмитриева · 35 страниц</p>
+<section class="viewer" id="viewer" aria-label="Просмотр портфолио"><div class="status" id="status" role="status">Загружаем портфолио…</div><canvas id="page" aria-label="Страница портфолио"></canvas></section>
+<nav class="controls" aria-label="Навигация по страницам"><button id="prev" disabled>← Назад</button><span class="count" id="counter">— / 35</span><button id="next" disabled>Вперёд →</button></nav>
+<a class="download" href="assets/art/portfolio.pdf" target="_blank" rel="noopener">Открыть оригинальный PDF</a>
+<p class="hint">Листайте стрелками на клавиатуре или кнопками. На телефоне можно провести пальцем влево или вправо.</p>
+</main>
+<script type="module">
+const url='assets/art/portfolio.pdf';
+const status=document.getElementById('status'),canvas=document.getElementById('page'),viewer=document.getElementById('viewer');
+const prev=document.getElementById('prev'),next=document.getElementById('next'),counter=document.getElementById('counter');
+let pdf=null,current=1,renderTask=null,token=0;
+function update(){counter.textContent=current+' / '+(pdf?.numPages||35);prev.disabled=!pdf||current===1;next.disabled=!pdf||current===pdf.numPages}
+async function render(){
+ if(!pdf)return;
+ const t=++token;status.hidden=false;status.textContent='Загружаем страницу '+current+'…';
+ try{
+  if(renderTask){renderTask.cancel();try{await renderTask.promise}catch(e){}renderTask=null}
+  const p=await pdf.getPage(current);if(t!==token)return;
+  const viewport=p.getViewport({scale:1});
+  const width=Math.max(220,Math.min(viewer.clientWidth,1320));
+  const maxHeight=Math.max(220,window.innerHeight-235);
+  const scale=Math.min(width/viewport.width,maxHeight/viewport.height);
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const view=p.getViewport({scale:scale*dpr});
+  canvas.width=Math.floor(view.width);canvas.height=Math.floor(view.height);
+  canvas.style.width=Math.floor(view.width/dpr)+'px';canvas.style.height=Math.floor(view.height/dpr)+'px';
+  renderTask=p.render({canvasContext:canvas.getContext('2d'),viewport:view});
+  await renderTask.promise;if(t!==token)return;status.hidden=true;update();
+ }catch(e){if(e?.name==='RenderingCancelledException')return;status.textContent='Не удалось отобразить страницу. Откройте оригинальный PDF.';console.error(e)}
+}
+function go(n){if(!pdf||n<1||n>pdf.numPages||n===current)return;current=n;update();render()}
+prev.addEventListener('click',()=>go(current-1));next.addEventListener('click',()=>go(current+1));
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(current+1);if(e.key==='ArrowLeft')go(current-1)});
+let startX=null;viewer.addEventListener('touchstart',e=>{startX=e.touches[0].clientX},{passive:true});
+viewer.addEventListener('touchend',e=>{if(startX===null)return;const delta=e.changedTouches[0].clientX-startX;if(Math.abs(delta)>50)go(current+(delta<0?1:-1));startX=null},{passive:true});
+let resizeId;window.addEventListener('resize',()=>{clearTimeout(resizeId);resizeId=setTimeout(render,180)});
+try{
+ const pdfjs=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');
+ pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
+ pdf=await pdfjs.getDocument(url).promise;update();await render();
+}catch(e){status.textContent='PDF пока недоступен. Попробуйте открыть оригинал по ссылке ниже.';console.error(e)}
+</script>
+</body></html>
