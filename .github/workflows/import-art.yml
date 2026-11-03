@@ -1,0 +1,50 @@
+name: Import Art portfolio PDF
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'art_portfolio.zip'
+      - '.github/workflows/import-art.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Extract PDF
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          archive=Path('art_portfolio.zip')
+          if not archive.exists():
+              raise SystemExit('Upload art_portfolio.zip to the repository root first')
+          with ZipFile(archive) as z:
+              files=[f for f in z.infolist() if not f.is_dir()]
+              if len(files)!=1 or files[0].filename!='portfolio.pdf':
+                  raise ValueError('Archive must contain only portfolio.pdf at root')
+              if files[0].file_size>80_000_000:
+                  raise ValueError('PDF exceeds 80 MB')
+              content=z.read(files[0])
+              if not content.startswith(b'%PDF-'):
+                  raise ValueError('Invalid PDF')
+              target=Path('assets/art/portfolio.pdf')
+              target.parent.mkdir(parents=True,exist_ok=True)
+              target.write_bytes(content)
+              print('Imported',len(content),'bytes')
+          PY
+      - name: Commit portfolio PDF
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/art/portfolio.pdf
+          if ! git diff --cached --quiet; then
+            git commit -m "assets: import art portfolio PDF"
+            git push
+          fi
