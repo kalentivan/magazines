@@ -32,43 +32,33 @@ button:disabled{opacity:.35;cursor:default}.count{font-size:15px;min-width:95px;
 <a class="download" href="assets/art/portfolio.pdf" target="_blank" rel="noopener">Открыть оригинальный PDF</a>
 <p class="hint">Листайте стрелками на клавиатуре или кнопками. На телефоне можно провести пальцем влево или вправо.</p>
 </main>
-<script type="module">
-const url='assets/art/portfolio.pdf';
+<script>
 const status=document.getElementById('status'),canvas=document.getElementById('page'),viewer=document.getElementById('viewer');
 const prev=document.getElementById('prev'),next=document.getElementById('next'),counter=document.getElementById('counter');
-let pdf=null,current=1,renderTask=null,token=0;
-function update(){counter.textContent=current+' / '+(pdf?.numPages||35);prev.disabled=!pdf||current===1;next.disabled=!pdf||current===pdf.numPages}
+const TOTAL=35;let current=1,token=0;const cache=new Map();
+function src(n){return 'assets/art/pages/'+String(n).padStart(2,'0')+'.webp'}
+function load(n){if(n<1||n>TOTAL)return Promise.reject(Error('Invalid page'));if(!cache.has(n)){const p=new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(Error('Image not found: '+src(n)));img.src=src(n)});cache.set(n,p)}return cache.get(n)}
+function update(){counter.textContent=current+' / '+TOTAL;prev.disabled=current===1;next.disabled=current===TOTAL}
 async function render(){
- if(!pdf)return;
  const t=++token;status.hidden=false;status.textContent='Загружаем страницу '+current+'…';
  try{
-  if(renderTask){renderTask.cancel();try{await renderTask.promise}catch(e){}renderTask=null}
-  const p=await pdf.getPage(current);if(t!==token)return;
-  const viewport=p.getViewport({scale:1});
-  const width=Math.max(220,Math.min(viewer.clientWidth,1320));
-  const maxHeight=Math.max(220,window.innerHeight-235);
-  const scale=Math.min(width/viewport.width,maxHeight/viewport.height);
-  // Render above CSS resolution for sharper artwork and fine typography.
-  // Cap the bitmap to avoid excessive memory use on large displays.
-  const quality=Math.min(3,Math.max(2.5,window.devicePixelRatio||1));
-  const dpr=Math.min(quality,4096/Math.max(viewport.width*scale,viewport.height*scale));
-  const view=p.getViewport({scale:scale*dpr});
-  canvas.width=Math.floor(view.width);canvas.height=Math.floor(view.height);
-  canvas.style.width=Math.floor(view.width/dpr)+'px';canvas.style.height=Math.floor(view.height/dpr)+'px';
-  renderTask=p.render({canvasContext:canvas.getContext('2d'),viewport:view});
-  await renderTask.promise;if(t!==token)return;status.hidden=true;update();
- }catch(e){if(e?.name==='RenderingCancelledException')return;status.textContent='Не удалось отобразить страницу. Откройте оригинальный PDF.';console.error(e)}
+  const img=await load(current);if(t!==token)return;
+  const availableWidth=Math.max(200,viewer.clientWidth),availableHeight=Math.max(200,window.innerHeight-235);
+  const scale=Math.min(availableWidth/img.naturalWidth,availableHeight/img.naturalHeight);
+  const w=Math.floor(img.naturalWidth*scale),h=Math.floor(img.naturalHeight*scale);
+  canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+  canvas.style.width=w+'px';canvas.style.height=h+'px';
+  canvas.getContext('2d').drawImage(img,0,0);
+  status.hidden=true;update();
+  for(const n of [current+1,current-1,current+2])if(n>=1&&n<=TOTAL)load(n).catch(()=>{});
+ }catch(e){if(t!==token)return;status.textContent='Страницы пока не загружены. Откройте оригинальный PDF по ссылке ниже.';console.error(e)}
 }
-function go(n){if(!pdf||n<1||n>pdf.numPages||n===current)return;current=n;update();render()}
+function go(n){if(n<1||n>TOTAL||n===current)return;current=n;update();render()}
 prev.addEventListener('click',()=>go(current-1));next.addEventListener('click',()=>go(current+1));
 document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(current+1);if(e.key==='ArrowLeft')go(current-1)});
 let startX=null;viewer.addEventListener('touchstart',e=>{startX=e.touches[0].clientX},{passive:true});
 viewer.addEventListener('touchend',e=>{if(startX===null)return;const delta=e.changedTouches[0].clientX-startX;if(Math.abs(delta)>50)go(current+(delta<0?1:-1));startX=null},{passive:true});
 let resizeId;window.addEventListener('resize',()=>{clearTimeout(resizeId);resizeId=setTimeout(render,180)});
-try{
- const pdfjs=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');
- pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
- pdf=await pdfjs.getDocument(url).promise;update();await render();
-}catch(e){status.textContent='PDF пока недоступен. Попробуйте открыть оригинал по ссылке ниже.';console.error(e)}
+update();render();
 </script>
 </body></html>
