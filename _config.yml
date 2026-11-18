@@ -1,0 +1,7 @@
+exclude:
+  - backend
+  - tests
+  - scripts
+  - docs
+  - README.md
+  - package.json
