@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /magazines/
+Sitemap: https://kalentivan.github.io/magazines/sitemap.xml
+# On project GitHub Pages this is informational: crawlers read host-root /robots.txt.

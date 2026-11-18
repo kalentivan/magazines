@@ -1,0 +1,8 @@
+# Replace domain after owner supplies DNS/server access.
+leads.example.com {
+    request_body {
+        max_size 16KB
+    }
+    # Keep server bound to loopback. Do not expose database or admin paths.
+    reverse_proxy 127.0.0.1:8080
+}
