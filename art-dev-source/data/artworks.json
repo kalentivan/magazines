@@ -1,0 +1,202 @@
+[
+  {
+    "id": "MD-0001",
+    "slug": "uverennost-v-vybore",
+    "title": "Уверенность в выборе",
+    "year": 2010,
+    "genre": "пейзаж",
+    "themes": [
+      "море"
+    ],
+    "materials": [
+      "акварель"
+    ],
+    "width_cm": null,
+    "height_cm": null,
+    "price": null,
+    "currency": null,
+    "status": "unknown",
+    "primary_image": "/assets/works/uverennost-v-vybore-1600.webp",
+    "images": [],
+    "series": "Морская серия",
+    "description": "",
+    "published": true,
+    "verification_status": "source_checked_dimensions_pending",
+    "source_page": 3
+  },
+  {
+    "id": "MD-0002",
+    "slug": "nastroenie",
+    "title": "Настроение",
+    "year": 2018,
+    "genre": "пейзаж",
+    "themes": [
+      "море"
+    ],
+    "materials": [
+      "акварель"
+    ],
+    "width_cm": null,
+    "height_cm": null,
+    "price": null,
+    "currency": null,
+    "status": "unknown",
+    "primary_image": "/assets/works/nastroenie-1600.webp",
+    "images": [],
+    "series": "Морская серия",
+    "description": "",
+    "published": true,
+    "verification_status": "source_checked_dimensions_pending",
+    "source_page": 4
+  },
+  {
+    "id": "MD-0003",
+    "slug": "utro-kofe",
+    "title": "Утро. Кофе",
+    "year": 2018,
+    "genre": "пейзаж",
+    "themes": [
+      "море"
+    ],
+    "materials": [
+      "акварель"
+    ],
+    "width_cm": null,
+    "height_cm": null,
+    "price": null,
+    "currency": null,
+    "status": "unknown",
+    "primary_image": "/assets/works/utro-kofe-1600.webp",
+    "images": [],
+    "series": "Морская серия",
+    "description": "",
+    "published": true,
+    "verification_status": "source_checked_dimensions_pending",
+    "source_page": 5
+  },
+  {
+    "id": "MD-0004",
+    "slug": "bushuyushchee-more",
+    "title": "Бушующее море",
+    "year": 2018,
+    "genre": "пейзаж",
+    "themes": [
+      "море"
+    ],
+    "materials": [
+      "масло"
+    ],
+    "width_cm": null,
+    "height_cm": null,
+    "price": null,
+    "currency": null,
+    "status": "unknown",
+    "primary_image": "/assets/works/bushuyushchee-more-1600.webp",
+    "images": [],
+    "series": "Морская серия",
+    "description": "",
+    "published": true,
+    "verification_status": "source_checked_dimensions_pending",
+    "source_page": 6
+  },
+  {
+    "id": "MD-0005",
+    "slug": "antarktida",
+    "title": "Антарктида",
+    "year": 2017,
+    "genre": "пейзаж",
+    "themes": [
+      "море"
+    ],
+    "materials": [
+      "акварель"
+    ],
+    "width_cm": null,
+    "height_cm": null,
+    "price": null,
+    "currency": null,
+    "status": "unknown",
+    "primary_image": "/assets/works/antarktida-1600.webp",
+    "images": [],
+    "series": "Морская серия",
+    "description": "",
+    "published": true,
+    "verification_status": "source_checked_dimensions_pending",
+    "source_page": 7
+  },
+  {
+    "id": "MD-0006",
+    "slug": "garmoniya-vody",
+    "title": "Гармония воды",
+    "year": 2017,
+    "genre": "пейзаж",
+    "themes": [
+      "море"
+    ],
+    "materials": [
+      "акварель"
+    ],
+    "width_cm": null,
+    "height_cm": null,
+    "price": null,
+    "currency": null,
+    "status": "unknown",
+    "primary_image": "/assets/works/garmoniya-vody-1600.webp",
+    "images": [],
+    "series": "Морская серия",
+    "description": "",
+    "published": true,
+    "verification_status": "source_checked_dimensions_pending",
+    "source_page": 8
+  },
+  {
+    "id": "MD-0007",
+    "slug": "techeniya-pamyati",
+    "title": "Течения памяти",
+    "year": 2026,
+    "genre": "пейзаж",
+    "themes": [
+      "море"
+    ],
+    "materials": [
+      "акварель"
+    ],
+    "width_cm": null,
+    "height_cm": null,
+    "price": null,
+    "currency": null,
+    "status": "unknown",
+    "primary_image": "/assets/works/techeniya-pamyati-1600.webp",
+    "images": [],
+    "series": "Морская серия",
+    "description": "",
+    "published": true,
+    "verification_status": "source_checked_dimensions_pending",
+    "source_page": 9
+  },
+  {
+    "id": "MD-0008",
+    "slug": "zvuki-voln",
+    "title": "Звуки волн",
+    "year": 2017,
+    "genre": "пейзаж",
+    "themes": [
+      "море"
+    ],
+    "materials": [
+      "акварель"
+    ],
+    "width_cm": null,
+    "height_cm": null,
+    "price": null,
+    "currency": null,
+    "status": "unknown",
+    "primary_image": "/assets/works/zvuki-voln-1600.webp",
+    "images": [],
+    "series": "Морская серия",
+    "description": "",
+    "published": true,
+    "verification_status": "source_checked_dimensions_pending",
+    "source_page": 10
+  }
+]
